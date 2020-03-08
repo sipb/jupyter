@@ -18,6 +18,7 @@ var (
 	ldapServer  = flag.String("ldap_server", "scripts-ldap.mit.edu:389", "LDAP server to query")
 	defaultHost = flag.String("default_host", "scripts.mit.edu", "default host to route traffic to if SNI/Host header cannot be parsed or cannot be found in LDAP")
 	baseDn      = flag.String("base_dn", "ou=VirtualHosts,dc=scripts,dc=mit,dc=edu", "base DN to query for hosts")
+	localRange  = flag.String("local_range", "18.4.86.0/24", "IP block for client IP spoofing")
 )
 
 func always(context.Context, string) bool {
@@ -25,7 +26,8 @@ func always(context.Context, string) bool {
 }
 
 type ldapTarget struct {
-	ldap *ldap.Conn
+	localPoolRange *net.IPNet
+	ldap           *ldap.Conn
 }
 
 func (l *ldapTarget) HandleConn(netConn net.Conn) {
@@ -48,9 +50,24 @@ func (l *ldapTarget) HandleConn(netConn net.Conn) {
 		return
 	}
 	laddr := netConn.LocalAddr().(*net.TCPAddr)
+	destAddrStr := net.JoinHostPort(pool, fmt.Sprintf("%d", laddr.Port))
+	destAddr, err := net.ResolveTCPAddr("tcp", destAddrStr)
+	if err != nil {
+		netConn.Close()
+		log.Printf("parsing pool address %q: %v", pool, err)
+		return
+	}
 	dp := &tcpproxy.DialProxy{
-		Addr: fmt.Sprintf("%s:%d", pool, laddr.Port),
-		// TODO: Set DialContext to override the source address
+		Addr: destAddrStr,
+	}
+	raddr := netConn.RemoteAddr().(*net.TCPAddr)
+	if l.localPoolRange.Contains(destAddr.IP) {
+		sourceAddr := &net.TCPAddr{
+			IP: raddr.IP,
+		}
+		dp.DialContext = func(ctx context.Context, network, address string) (net.Conn, error) {
+			return net.DialTCP(network, sourceAddr, destAddr)
+		}
 	}
 	dp.HandleConn(netConn)
 }
@@ -84,8 +101,16 @@ func main() {
 	}
 	defer l.Close()
 
+	_, ipnet, err := net.ParseCIDR(*localRange)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var p tcpproxy.Proxy
-	t := &ldapTarget{ldap: l}
+	t := &ldapTarget{
+		localPoolRange: ipnet,
+		ldap:           l,
+	}
 	for _, addr := range strings.Split(*httpAddrs, ",") {
 		p.AddHTTPHostMatchRoute(addr, always, t)
 	}
