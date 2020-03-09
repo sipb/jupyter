@@ -64,12 +64,13 @@ func (l *ldapTarget) HandleConn(netConn net.Conn) {
 	}
 	raddr := netConn.RemoteAddr().(*net.TCPAddr)
 	if l.localPoolRange.Contains(destAddr.IP) {
-		sourceAddr := &net.TCPAddr{
-			IP: raddr.IP,
+		td := &TransparentDialer{
+			SourceAddr: &net.TCPAddr{
+				IP: raddr.IP,
+			},
+			DestAddr: destAddr,
 		}
-		dp.DialContext = func(ctx context.Context, network, address string) (net.Conn, error) {
-			return net.DialTCP(network, sourceAddr, destAddr)
-		}
+		dp.DialContext = td.DialContext
 	}
 	dp.HandleConn(netConn)
 }
