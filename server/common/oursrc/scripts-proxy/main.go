@@ -28,14 +28,27 @@ func always(context.Context, string) bool {
 }
 
 type ldapTarget struct {
-	localPoolRange *net.IPNet
-	ldap           *ldap.Pool
+	localPoolRange    *net.IPNet
+	ldap              *ldap.Pool
+	statuszServer     *HijackedServer
+	unavailableServer *HijackedServer
 }
 
 func (l *ldapTarget) HandleConn(netConn net.Conn) {
 	var pool string
 	var err error
 	if conn, ok := netConn.(*tcpproxy.Conn); ok {
+		switch conn.HostName {
+		case "proxy.scripts.scripts.mit.edu":
+			// Special handling for proxy.scripts.scripts.mit.edu
+			l.statuszServer.HandleConn(netConn)
+			return
+		case "heartbeat.scripts.scripts.mit.edu":
+			if nolvsPresent() {
+				l.unavailableServer.HandleConn(netConn)
+				return
+			}
+		}
 		pool, err = l.ldap.ResolvePool(conn.HostName)
 		if err != nil {
 			log.Printf("resolving %q: %v", conn.HostName, err)
@@ -87,8 +100,10 @@ func main() {
 
 	var p tcpproxy.Proxy
 	t := &ldapTarget{
-		localPoolRange: ipnet,
-		ldap:           ldapPool,
+		localPoolRange:    ipnet,
+		ldap:              ldapPool,
+		statuszServer:     NewHijackedServer(nil),
+		unavailableServer: NewUnavailableServer(),
 	}
 	for _, addr := range strings.Split(*httpAddrs, ",") {
 		p.AddHTTPHostMatchRoute(addr, always, t)
