@@ -43,13 +43,12 @@ func (c *conn) resolvePool(hostname string) (string, error) {
 	defer c.mu.Unlock()
 
 	escapedHostname := ldap.EscapeFilter(hostname)
-	req := ldap.NewSearchRequest(
-		c.baseDn,
-		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf("(|(scriptsVhostName=%s)(scriptsVhostAlias=%s))", escapedHostname, escapedHostname),
-		[]string{"scriptsVhostPoolIPv4"},
-		nil,
-	)
+	req := &ldap.SearchRequest{
+		BaseDN:     c.baseDn,
+		Scope:      ldap.ScopeWholeSubtree,
+		Filter:     fmt.Sprintf("(|(scriptsVhostName=%s)(scriptsVhostAlias=%s))", escapedHostname, escapedHostname),
+		Attributes: []string{"scriptsVhostPoolIPv4"},
+	}
 	sr, err := c.conn.Search(req)
 	if err != nil {
 		return "", err

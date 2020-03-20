@@ -60,6 +60,7 @@ func (l *ldapTarget) HandleConn(netConn net.Conn) {
 			log.Printf("resolving default pool: %v", err)
 		}
 	}
+	// TODO: Serve an error page? Forward to scripts-director?
 	if pool == "" {
 		netConn.Close()
 		return
@@ -75,8 +76,8 @@ func (l *ldapTarget) HandleConn(netConn net.Conn) {
 	dp := &tcpproxy.DialProxy{
 		Addr: destAddrStr,
 	}
-	raddr := netConn.RemoteAddr().(*net.TCPAddr)
 	if l.localPoolRange.Contains(destAddr.IP) {
+		raddr := netConn.RemoteAddr().(*net.TCPAddr)
 		td := &TransparentDialer{
 			SourceAddr: &net.TCPAddr{
 				IP: raddr.IP,
