@@ -35,6 +35,8 @@ os.environ['PATH'] = os.path.join(sys.exec_prefix, 'bin') + ':' + os.environ['PA
 if sys.prefix != sys.base_prefix:
     os.environ['VIRTUAL_ENV'] = sys.prefix
 
+    os.environ['RUSTUP_HOME'] = os.path.join(sys.prefix, 'rustup')
+
 #------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
 #------------------------------------------------------------------------------
@@ -1067,7 +1069,17 @@ c.Spawner.default_url = '/lab'
 #  process's environment (such as `CONFIGPROXY_AUTH_TOKEN`) is not passed to the
 #  single-user server's process.
 #  Default: ['PATH', 'PYTHONPATH', 'CONDA_ROOT', 'CONDA_DEFAULT_ENV', 'VIRTUAL_ENV', 'LANG', 'LC_ALL']
-# c.Spawner.env_keep = ['PATH', 'PYTHONPATH', 'CONDA_ROOT', 'CONDA_DEFAULT_ENV', 'VIRTUAL_ENV', 'LANG', 'LC_ALL']
+c.Spawner.env_keep = [
+    'PATH',
+    'PYTHONPATH',
+    'CONDA_ROOT',
+    'CONDA_DEFAULT_ENV',
+    'VIRTUAL_ENV',
+    'LANG',
+    'LC_ALL',
+    'CARGO_HOME',
+    'RUSTUP_HOME',
+]
 
 ## Extra environment variables to set for the single-user server's process.
 #  

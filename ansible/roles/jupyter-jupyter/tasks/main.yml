@@ -20,6 +20,8 @@
       - pari-gp2c
       - pari-galpol
       - libreadline-dev
+      # Rust
+      - cmake
 - name: Install jupyterhub node dependencies
   npm:
     name: "{{ item }}"
@@ -515,6 +517,39 @@
       creates: /opt/jupyterhub/share/jupyter/kernels/ir/kernel.json
     environment:
       PATH: /opt/jupyterhub/bin:{{ ansible_env.PATH }}
+- name: Install Rust
+  environment:
+    CARGO_HOME: /opt/jupyterhub
+    RUSTUP_HOME: /opt/jupyterhub/rustup
+  block:
+  - tempfile:
+      state: directory
+    register: rustup
+    changed_when: no
+  - name: Download rustup-init
+    get_url:
+      url: https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init
+      dest: '{{ rustup.path }}/rustup-init'
+      mode: 0755
+    changed_when: no
+  - name: Install rustup
+    command: '{{ rustup.path }}/rustup-init --no-modify-path -y -c rust-src'
+    register: rustup_output
+    changed_when: "'unchanged' not in rustup_output"
+  - name: Install evcxr_repl
+    command: /opt/jupyterhub/bin/cargo install evcxr_repl
+    args:
+      creates: /opt/jupyterhub/bin/evcxr
+  - name: Install evcxr_jupyter
+    command: /opt/jupyterhub/bin/cargo install evcxr_jupyter
+    args:
+      creates: /opt/jupyterhub/bin/evcxr_jupyter
+  - name: Install Rust kernel
+    command: /opt/jupyterhub/bin/evcxr_jupyter --install
+    environment:
+      JUPYTER_CONFIG_DIR: /opt/jupyterhub/share/jupyter
+    args:
+      creates: /opt/jupyterhub/share/jupyter/kernels/rust/kernel.json
 # TODO: Real database
 # TODO: Other config settings
 - name: Configure jupyterhub
