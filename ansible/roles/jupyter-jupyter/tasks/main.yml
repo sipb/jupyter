@@ -10,6 +10,9 @@
       # Dependencies of PIP packages below
       - libcurl4-openssl-dev
       - unixodbc-dev
+      - libgdal-dev
+      - libgeos-dev
+      - libproj-dev
       # User packages
       - python3-gmpy2
       - python3-pyodbc
@@ -93,6 +96,7 @@
     - boto
     - bottleneck
     - brotlipy
+    - cartopy
     - cffi
     - chardet
     - click
