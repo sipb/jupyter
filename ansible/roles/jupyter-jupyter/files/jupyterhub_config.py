@@ -7,6 +7,7 @@ import systemdspawner
 from tempfile import mkdtemp, NamedTemporaryFile
 from tornado.escape import json_encode
 import jinja2.ext
+import asyncio
 import base64
 import json
 import logging
@@ -287,6 +288,25 @@ class MITSystemdSpawner(systemdspawner.SystemdSpawner):
             'Environment': 'XDG_CACHE_HOME=/var/cache/jupyter/'+self.unit_name,
         }
     slice = 'jupyter.slice'
+
+    async def poll(self):
+        proc = await asyncio.create_subprocess_exec(
+            'systemctl',
+            'is-active',
+            self.unit_name,
+            # hide stdout, but don't capture stderr at all
+            stdout=asyncio.subprocess.DEVNULL
+        )
+        ret = await proc.wait()
+
+        if ret == 0:
+            # Running
+            return None
+        elif ret == 3:
+            # Stopped, failed, or does not exist
+            return 1
+        else:
+            raise OSError("unable to determine unit status (%s)" % (ret,))
 
     uid = Integer()
     jupyter_home = Unicode()
