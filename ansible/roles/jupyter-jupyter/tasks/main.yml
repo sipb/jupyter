@@ -570,6 +570,14 @@
       command: /opt/jupyterhub/bin/python /opt/jupyterhub/ijava/install.py --sys-prefix --replace
       args:
         creates: /opt/jupyterhub/share/jupyter/kernels/java/kernel.json
+- name: Install C kernel
+  block:
+    - pip:
+      extra_args: --upgrade
+      name:
+      - jupyter-c-kernel
+    - name: Install kernelspec
+      command: /opt/jupyterhub/bin/install_c_kernel --sys-prefix
 # TODO: Real database
 # TODO: Other config settings
 - name: Configure jupyterhub
