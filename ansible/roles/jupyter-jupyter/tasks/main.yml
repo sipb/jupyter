@@ -573,9 +573,9 @@
 - name: Install C kernel
   block:
     - pip:
-      extra_args: --upgrade
-      name:
-      - jupyter-c-kernel
+        extra_args: --upgrade
+        name:
+          - jupyter-c-kernel
     - name: Install kernelspec
       command: /opt/jupyterhub/bin/install_c_kernel --sys-prefix
 # TODO: Real database
