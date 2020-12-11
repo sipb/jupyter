@@ -573,6 +573,8 @@
         creates: /opt/jupyterhub/share/jupyter/kernels/java/kernel.json
 - name: Install C kernel
   command: /opt/jupyterhub/bin/install_c_kernel --sys-prefix
+    args:
+      creates: /opt/jupyterhub/share/jupyter/kernels/c/kernel.json
 # TODO: Real database
 # TODO: Other config settings
 - name: Configure jupyterhub
