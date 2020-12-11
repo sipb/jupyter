@@ -18,6 +18,7 @@
       - python3-pyodbc
       - python3-gdal
       - texlive-full
+      - manpages-dev
       # PARI kernel
       - pari-gp
       - pari-gp2c
