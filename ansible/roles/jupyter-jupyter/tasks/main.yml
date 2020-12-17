@@ -576,6 +576,46 @@
   command: /opt/jupyterhub/bin/install_c_kernel --sys-prefix
   args:
     creates: /opt/jupyterhub/share/jupyter/kernels/c/kernel.json
+- name: Check for Wolfram
+  stat:
+    path: /opt/Mathematica/11.3/Executables/WolframKernel
+  register: wolframkernel
+- name: Install Wolfram kernel
+  when: wolframkernel.stat.exists == true
+  block:
+    - unarchive:
+        src: https://github.com/WolframResearch/WolframLanguageForJupyter/releases/download/v0.9.2/WolframLanguageForJupyter-0.9.2.paclet
+        dest: /opt/jupyterhub
+        remote_src: yes
+    - name: Generate Wolfram spec
+      set_fact:
+        wolfram_spec:
+          argv:
+            - /opt/Mathematica/11.3/Executables/WolframKernel
+            - "-script"
+            - /opt/jupyterhub/WolframLanguageForJupyter-0.9.2/Resources/KernelForWolframLanguageForJupyter.wl
+            - "{connection_file}"
+          display_name: Wolfram Language 11.3
+          language: Wolfram Language
+          interrupt_mode: signal
+          env: {}
+          metadata: {}
+    - name: Read current kernels
+      command: /opt/jupyterhub/bin/jupyter kernelspec list --json
+      check_mode: no
+      changed_when: no
+      register: jupyter_kernels
+    - name: Install kernel spec
+      shell: |
+        set -ex
+        tmpdir=$(mktemp -d)
+        trap "{ rm -rf $tmpdir; }" EXIT
+        mkdir "$tmpdir/wolframlanguage11.3"
+        cat > "$tmpdir/wolframlanguage11.3/kernel.json"
+        /opt/jupyterhub/bin/jupyter kernelspec install --sys-prefix --replace "$tmpdir/wolframlanguage11.3"
+      args:
+        stdin: "{{ wolfram_spec | to_json }}"
+      when: wolfram_spec != (jupyter_kernels.stdout | from_json | json_query('kernelspecs."wolframlanguage11.3".spec'))
 # TODO: Real database
 # TODO: Other config settings
 - name: Configure jupyterhub
