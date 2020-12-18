@@ -890,7 +890,7 @@ c.JupyterHub.internal_ssl = True
 #  
 #  When using SSL (i.e. always) this also requires a wildcard SSL certificate.
 #  Default: ''
-c.JupyterHub.subdomain_host = 'https://jupyter.sipb.org'
+c.JupyterHub.subdomain_host = 'https://jupyter.mit.edu'
 
 ## Paths to search for jinja templates, before using the default templates.
 #  Default: []
@@ -933,7 +933,7 @@ c.JupyterHub.subdomain_host = 'https://jupyter.sipb.org'
 #  
 #  Use with internal_ssl
 #  Default: []
-c.JupyterHub.trusted_alt_names = ['DNS:*.jupyter.sipb.org']
+c.JupyterHub.trusted_alt_names = ['DNS:*.jupyter.sipb.org','DNS:*.jupyter.mit.edu']
 
 ## Downstream proxy IP addresses to trust.
 #  
