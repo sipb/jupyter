@@ -933,7 +933,7 @@ c.JupyterHub.subdomain_host = 'https://jupyter.mit.edu'
 #  
 #  Use with internal_ssl
 #  Default: []
-c.JupyterHub.trusted_alt_names = ['DNS:*.jupyter.sipb.org','DNS:*.jupyter.mit.edu']
+#c.JupyterHub.trusted_alt_names = []
 
 ## Downstream proxy IP addresses to trust.
 #  
