@@ -1,9 +1,27 @@
 ---
+- name: Install newer Node
+  block:
+    - name: Install nodejs repo
+      copy:
+        dest: /etc/apt/sources.list.d/nodesource.list
+        content: |
+          deb https://deb.nodesource.com/{{version}} {{ansible_distribution_release}} main
+          deb-src https://deb.nodesource.com/{{version}} {{ansible_distribution_release}} main
+      vars:
+        version: node_14.x
+      register: node_repo
+    - name: Install NodeSource key
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+      register: node_key
+    - name: Update package lists
+      apt:
+        update_cache: yes
+      when: node_repo.changed or node_key.changed
 - name: Install jupyterhub dependencies
   package:
     name:
       - virtualenv
-      - npm
       - nodejs
       - cython3
       - libhesiod-dev
