@@ -88,7 +88,7 @@
     - jupyterlab-kernelspy
     - astrowidgets
     - octave_kernel
-    - jupyter-lsp
+    - jupyterlab-lsp
     - pari_jupyter
     - jupyter-c-kernel
     # Language servers
@@ -309,7 +309,6 @@
     #- jupyterlab-drawio
     #- "@aquirdturtle/collapsible_headings"
     - "@jupyterlab/geojson-extension"
-    - "@krassowski/jupyterlab-lsp"
   register: result
   changed_when: result.rc != 37
   failed_when: result.rc not in (0, 37)
@@ -647,6 +646,10 @@
         src: https://root.cern.ch/download/cling/cling_2020-11-05_ROOT-ubuntu2004.tar.bz2
         dest: /opt/jupyterhub/cling
         remote_src: yes
+    - file:
+        dest: /opt/jupyterhub/bin/cling
+        src: /opt/jupyterhub/cling/cling_2020-11-05_ROOT-ubuntu2004/bin/cling
+        state: link
     - name: Install Cling Jupyter kernel
       pip:
         extra_args: --upgrade
@@ -662,7 +665,7 @@
     - name: Install kernel spec
       shell: |
         /opt/jupyterhub/bin/jupyter kernelspec install --sys-prefix --replace "/opt/jupyterhub/cling/cling_2020-11-05_ROOT-ubuntu2004/share/cling/Jupyter/kernel/cling-cpp{{item}}"
-      when: not (jupyter_kernels.stdout | from_json | json_query('kernelspecs."cling-cpp'+item+'".spec'))
+      when: not (jupyter_kernels.stdout | from_json | json_query('kernelspecs."cling-cpp'+(item | string)+'".spec'))
       loop:
         - 11
         - 14
