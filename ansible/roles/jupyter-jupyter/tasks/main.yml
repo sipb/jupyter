@@ -297,16 +297,17 @@
     jupyter labextension check {{extensions|join(" ")}} && exit 37
     jupyter labextension install {{extensions|join(" ")}}
   vars:
+    # TODO: Uncomment extensions as they gain support for JupyterLab 3.x
     extensions:
     - "@jupyter-widgets/jupyterlab-manager"
-    - "@bokeh/jupyter_bokeh"
+    #- "@bokeh/jupyter_bokeh"
     - jupyterlab-python-file
-    - "@parente/jupyterlab-quickopen"
-    - "@jupyterlab/hdf5"
-    - "@jupyterlab/latex"
+    #- "@parente/jupyterlab-quickopen"
+    #- "@jupyterlab/hdf5"
+    #- "@jupyterlab/latex"
     - jupyterlab-kernelspy
-    - jupyterlab-drawio
-    - "@aquirdturtle/collapsible_headings"
+    #- jupyterlab-drawio
+    #- "@aquirdturtle/collapsible_headings"
     - "@jupyterlab/geojson-extension"
     - "@krassowski/jupyterlab-lsp"
   register: result
