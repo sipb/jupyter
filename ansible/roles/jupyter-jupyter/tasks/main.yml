@@ -651,7 +651,7 @@
       pip:
         extra_args: --upgrade
         name:
-          - /opt/jupyterhub/cling/share/cling/Jupyter/kernel
+          - /opt/jupyterhub/cling/cling_2020-11-05_ROOT-ubuntu2004/share/cling/Jupyter/kernel
         virtualenv: /opt/jupyterhub
         virtualenv_site_packages: yes
     - name: Read current kernels
@@ -661,8 +661,8 @@
       register: jupyter_kernels
     - name: Install kernel spec
       shell: |
-        /opt/jupyterhub/bin/jupyter kernelspec install --sys-prefix --replace "/opt/jupyterhub/cling/share/cling/Jupyter/kernel/cling-cpp{{item}}"
-      when: not (jupyter_kernels.stdout | from_json | json_query('kernelspecs."wolframlanguage'+item+'".spec'))
+        /opt/jupyterhub/bin/jupyter kernelspec install --sys-prefix --replace "/opt/jupyterhub/cling/cling_2020-11-05_ROOT-ubuntu2004/share/cling/Jupyter/kernel/cling-cpp{{item}}"
+      when: not (jupyter_kernels.stdout | from_json | json_query('kernelspecs."cling-cpp'+item+'".spec'))
       loop:
         - 11
         - 14
