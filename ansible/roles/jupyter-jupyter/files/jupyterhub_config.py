@@ -1119,7 +1119,9 @@ c.Spawner.env_keep = [
 #  across upgrades, so if you are using the callable take care to verify it
 #  continues to work after upgrades!
 #  Default: {}
-# c.Spawner.environment = {}
+c.Spawner.environment = {
+    "JUPYTERHUB_SINGLEUSER_APP": "jupyter_server.serverapp.ServerApp",
+}
 
 ## Timeout (in seconds) before giving up on a spawned HTTP server
 #  
