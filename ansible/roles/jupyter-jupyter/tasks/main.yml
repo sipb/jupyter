@@ -62,7 +62,7 @@
   pip:
     extra_args: --upgrade
     name:
-    - jupyterhub
+    - git+https://github.com/jupyterhub/jupyterhub@refs/pull/3347/head
     - jupyterlab
     - jupyterlab_server
     - notebook
