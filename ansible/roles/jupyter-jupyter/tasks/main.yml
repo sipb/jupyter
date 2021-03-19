@@ -78,6 +78,7 @@
     - widgetsnbextension
     - ipywidgets
     - jupyter-archive
+    - jupyterlab-drawio
     - jupyterlab-git
     - jupyterlab-widgets
     - jupyterlab-quickopen
@@ -176,6 +177,7 @@
     - markupsafe
     - matplotlib
     - mccabe
+    - mechanize
     - mistune
     - mkl
     - mock
@@ -302,11 +304,9 @@
     - "@jupyter-widgets/jupyterlab-manager"
     #- "@bokeh/jupyter_bokeh"
     - jupyterlab-python-file
-    #- "@parente/jupyterlab-quickopen"
     #- "@jupyterlab/hdf5"
     #- "@jupyterlab/latex"
     - jupyterlab-kernelspy
-    #- jupyterlab-drawio
     #- "@aquirdturtle/collapsible_headings"
     - "@jupyterlab/geojson-extension"
   register: result
